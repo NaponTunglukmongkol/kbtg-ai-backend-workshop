@@ -3,36 +3,7 @@ package main
 import (
 	"database/sql"
 	"github.com/gofiber/fiber/v2"
-	"log"
-
-	_ "github.com/mattn/go-sqlite3"
 )
-
-func initDatabase() *sql.DB {
-	db, err := sql.Open("sqlite3", "./mydb.sqlite")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	createTableQuery := `CREATE TABLE IF NOT EXISTS users (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		membership TEXT,
-		name TEXT,
-		surname TEXT,
-		phone TEXT,
-		email TEXT,
-		join_date TEXT,
-		membership_level TEXT,
-		points INTEGER
-	)`
-
-	_, err = db.Exec(createTableQuery)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db
-}
 
 func setupRoutes(app *fiber.App, db *sql.DB) {
 	app.Get("/users", func(c *fiber.Ctx) error {
@@ -128,14 +99,4 @@ func setupRoutes(app *fiber.App, db *sql.DB) {
 		}
 		return c.SendStatus(200)
 	})
-}
-
-func main() {
-	db := initDatabase()
-	defer db.Close()
-
-	app := fiber.New()
-	setupRoutes(app, db)
-
-	app.Listen(":3000")
 }
