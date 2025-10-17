@@ -9,6 +9,8 @@ This project demonstrates a backend application built with Go and Fiber framewor
 - **POST /users**: Create a new user.
 - **PUT /users/{id}**: Update an existing user's information.
 - **DELETE /users/{id}**: Delete a user.
+- **POST /point_ledger**: Create a new point ledger entry.
+- **GET /point_ledger**: Retrieve point ledger entries filtered by `user_id`.
 
 ## Database Schema
 The `users` table contains the following fields:
@@ -74,6 +76,18 @@ Use `curl` or any API testing tool (e.g., Postman) to test the endpoints:
 - **DELETE /users/{id}**:
   ```bash
   curl -X DELETE http://127.0.0.1:3000/users/1
+  ```
+
+- **POST /point_ledger**:
+  ```bash
+  curl -X POST http://127.0.0.1:3000/point_ledger \
+       -H "Content-Type: application/json" \
+       -d '{"user_id":1,"change":100,"balance_after":200,"event_type":"transfer_in","transfer_id":123,"reference":"Order123","metadata":"{\"key\":\"value\"}","created_at":"2025-10-17T10:00:00Z"}'
+  ```
+
+- **GET /point_ledger?user_id={id}**:
+  ```bash
+  curl http://127.0.0.1:3000/point_ledger?user_id=1
   ```
 
 ## License

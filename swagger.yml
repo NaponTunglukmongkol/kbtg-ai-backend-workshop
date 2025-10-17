@@ -1,0 +1,363 @@
+openapi: 3.0.0
+info:
+  title: KBTG AI Backend Workshop
+  version: 1.0.0
+  description: |
+    Backend application for managing users, transfers, and point ledger.
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /users:
+    get:
+      summary: Retrieve all users
+      description: Fetch a list of all users.
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    membership:
+                      type: string
+                    name:
+                      type: string
+                    surname:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    join_date:
+                      type: string
+                    membership_level:
+                      type: string
+                    points:
+                      type: integer
+
+    post:
+      summary: Create a new user
+      description: Add a new user to the database.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                membership:
+                  type: string
+                name:
+                  type: string
+                surname:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                join_date:
+                  type: string
+                membership_level:
+                  type: string
+                points:
+                  type: integer
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+
+  /users/{id}:
+    get:
+      summary: Retrieve a specific user
+      description: Fetch details of a user by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  membership:
+                    type: string
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  phone:
+                    type: string
+                  email:
+                    type: string
+                  join_date:
+                    type: string
+                  membership_level:
+                    type: string
+                  points:
+                    type: integer
+
+    put:
+      summary: Update a user
+      description: Modify details of an existing user.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                membership:
+                  type: string
+                name:
+                  type: string
+                surname:
+                  type: string
+                phone:
+                  type: string
+                email:
+                  type: string
+                join_date:
+                  type: string
+                membership_level:
+                  type: string
+                points:
+                  type: integer
+      responses:
+        '200':
+          description: User updated successfully
+
+    delete:
+      summary: Delete a user
+      description: Remove a user from the database.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+
+  /transfers:
+    post:
+      summary: Create a transfer
+      description: Initiate a transfer between users.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from_user_id:
+                  type: integer
+                to_user_id:
+                  type: integer
+                amount:
+                  type: integer
+                note:
+                  type: string
+      responses:
+        '201':
+          description: Transfer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idempotency_key:
+                    type: string
+                  transfer_id:
+                    type: integer
+
+    get:
+      summary: Retrieve transfers
+      description: Fetch a list of transfers.
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of transfers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idempotency_key:
+                      type: string
+                    transfer_id:
+                      type: integer
+                    from_user_id:
+                      type: integer
+                    to_user_id:
+                      type: integer
+                    amount:
+                      type: integer
+                    status:
+                      type: string
+                    created_at:
+                      type: string
+                    updated_at:
+                      type: string
+
+  /transfers/{id}:
+    get:
+      summary: Retrieve a transfer
+      description: Fetch details of a transfer by idempotency key.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transfer details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idempotency_key:
+                    type: string
+                  transfer_id:
+                    type: integer
+                  from_user_id:
+                    type: integer
+                  to_user_id:
+                    type: integer
+                  amount:
+                    type: integer
+                  status:
+                    type: string
+                  created_at:
+                    type: string
+                  updated_at:
+                    type: string
+
+  /point_ledger:
+    post:
+      summary: Create a point ledger entry
+      description: Add a new entry to the point ledger.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: integer
+                change:
+                  type: integer
+                balance_after:
+                  type: integer
+                event_type:
+                  type: string
+                  enum: [transfer_out, transfer_in, adjust, earn, redeem]
+                transfer_id:
+                  type: integer
+                reference:
+                  type: string
+                metadata:
+                  type: string
+      responses:
+        '201':
+          description: Point ledger entry created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+
+    get:
+      summary: Retrieve point ledger entries
+      description: Fetch a list of point ledger entries.
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of point ledger entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    user_id:
+                      type: integer
+                    change:
+                      type: integer
+                    balance_after:
+                      type: integer
+                    event_type:
+                      type: string
+                    transfer_id:
+                      type: integer
+                    reference:
+                      type: string
+                    metadata:
+                      type: string
+                    created_at:
+                      type: string
